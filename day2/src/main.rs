@@ -1,11 +1,8 @@
 use std::cell::Cell;
 
-fn run_program(program: &Vec<Cell<usize>>) -> usize
-{
-    for n in program.chunks(4)
-    {
-        match n[0].get()
-        {
+fn run_program(program: &[Cell<usize>]) -> usize {
+    for n in program.chunks(4) {
+        match n[0].get() {
             1 => program[n[3].get()].set(program[n[1].get()].get() + program[n[2].get()].get()),
             2 => program[n[3].get()].set(program[n[1].get()].get() * program[n[2].get()].get()),
             99 => break,
@@ -13,7 +10,7 @@ fn run_program(program: &Vec<Cell<usize>>) -> usize
         };
     }
 
-    return program[0].get()
+    program[0].get()
 }
 
 fn main() {
@@ -21,7 +18,7 @@ fn main() {
 
     let base: Vec<_> = input
         .trim()
-        .split(",")
+        .split(',')
         .map(|s| Cell::new(s.parse::<usize>().unwrap()))
         .collect();
 
@@ -32,17 +29,14 @@ fn main() {
 
     println!("Part 1: {}", run_program(&program));
 
-    let target = 19690720;
+    let target = 19_690_720;
 
-    for verb in 0..99
-    {
-        for noun in 0..99
-        {
+    for verb in 0..99 {
+        for noun in 0..99 {
             let clone = base.clone();
             clone[1].set(noun);
             clone[2].set(verb);
-            if run_program(&clone) == target
-            {
+            if run_program(&clone) == target {
                 println!("Part 2: {}", 100 * noun + verb);
             }
         }
