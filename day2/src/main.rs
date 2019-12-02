@@ -31,13 +31,14 @@ fn main() {
 
     let target = 19_690_720;
 
-    for verb in 0..99 {
+    'outer: for verb in 0..99 {
         for noun in 0..99 {
             let clone = base.clone();
             clone[1].set(noun);
             clone[2].set(verb);
             if run_program(&clone) == target {
                 println!("Part 2: {}", 100 * noun + verb);
+                break 'outer;
             }
         }
     }
