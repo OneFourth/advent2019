@@ -1,11 +1,12 @@
 use std::collections::HashSet;
+use std::iter::FromIterator;
 
 type Point = (i32, i32);
 
-type Wire = HashSet<Point>;
+type Wire = Vec<Point>;
 
 fn build_wire(input_str: &str) -> Wire {
-    let mut wire = HashSet::new();
+    let mut wire: Vec<Point> = vec![];
 
     let mut x = 0;
     let mut y = 0;
@@ -23,12 +24,11 @@ fn build_wire(input_str: &str) -> Wire {
                 _ => (0, 0)
             };
 
-        println!("{}, {}, {}", count, a_x, a_y);
         for _ in 1..count+1 {
             x += a_x;
             y += a_y;
 
-            wire.insert((x,y));
+            wire.push((x,y));
         }
     }
     wire
@@ -59,10 +59,23 @@ fn main() {
     let input = include_str!("../input");
 
     let wires: Vec<_> = input.lines().map(|s| build_wire(s)).collect();
-    let distances: Vec<_> = wires[0].intersection(&wires[1]).map(|(x, y)| x.abs() + y.abs()).collect();
+    let sets: Vec<HashSet<_>> = wires.iter().map(|w| HashSet::from_iter(w)).collect();
+    let intersections: Vec<_> = sets[0].intersection(&sets[1]).collect();
+    let distances: Vec<_> = intersections.iter().map(|(x, y)| x.abs() + y.abs()).collect();
 
-    println!("{:?}", distances);
     println!("Part 1: {}", distances.iter().min().unwrap());
+
+    for i in &intersections
+    {
+        let mut total = 0;
+        for w in &wires
+        {
+            let val = w.iter().position(|&p| p == ***i).unwrap() + 1;
+            total += val;
+        }
+
+        println!("{}", total);
+    }
 
     //output(wires);
 }
