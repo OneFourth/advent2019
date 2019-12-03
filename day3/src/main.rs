@@ -22,7 +22,7 @@ fn build_wire(input_str: &str) -> Wire {
             _ => (0, 0),
         };
 
-        for _ in 1..count + 1 {
+        for _ in 1..=count {
             x += a_x;
             y += a_y;
 
@@ -32,6 +32,7 @@ fn build_wire(input_str: &str) -> Wire {
     wire
 }
 
+/*
 fn output(wires: Vec<Wire>) {
     let mut out: Vec<Vec<char>> = vec![vec!['.'; 1000]; 1000];
     out[300][300] = 'o';
@@ -48,12 +49,13 @@ fn output(wires: Vec<Wire>) {
         println!("{:?}", s.into_iter().collect::<String>());
     }
 }
+*/
 
 fn main() {
     let input = include_str!("../input");
 
     let wires: Vec<_> = input.lines().map(|s| build_wire(s)).collect();
-    let sets: Vec<HashSet<_>> = wires.iter().map(|w| HashSet::from_iter(w)).collect();
+    let sets: Vec<HashSet<_>> = wires.iter().map(HashSet::from_iter).collect();
     let intersections: Vec<_> = sets[0].intersection(&sets[1]).collect();
     let distances: Vec<_> = intersections
         .iter()
