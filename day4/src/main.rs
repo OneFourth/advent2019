@@ -6,16 +6,8 @@ fn is_valid_part1(s: usize) -> bool {
         .chars()
         .map(|d| d.to_digit(10).unwrap())
         .collect();
-    (val[0] <= val[1]
-        && val[1] <= val[2]
-        && val[2] <= val[3]
-        && val[3] <= val[4]
-        && val[4] <= val[5])
-        && (val[0] == val[1]
-            || val[1] == val[2]
-            || val[2] == val[3]
-            || val[3] == val[4]
-            || val[4] == val[5])
+
+    val.windows(2).all(|n| n[0] <= n[1]) && val.windows(2).any(|n| n[0] == n[1])
 }
 
 fn is_valid_part2(s: usize) -> bool {
@@ -26,18 +18,17 @@ fn is_valid_part2(s: usize) -> bool {
         .collect();
     let mut counts = HashMap::new();
 
+    println!(
+        "{:?}",
+        val.windows(2).filter(|n| n[0] == n[1]).collect::<Vec<_>>()
+    );
     for n in val.windows(2) {
         if n[0] == n[1] {
             *counts.entry(n[0]).or_insert(0) += 1;
         }
     }
 
-    (val[0] <= val[1]
-        && val[1] <= val[2]
-        && val[2] <= val[3]
-        && val[3] <= val[4]
-        && val[4] <= val[5])
-        && counts.values().any(|&x| x == 1)
+    val.windows(2).all(|n| n[0] <= n[1]) && counts.values().any(|&x| x == 1)
 }
 
 fn main() {
