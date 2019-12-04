@@ -43,7 +43,7 @@ fn is_valid_part2(s: usize) -> bool {
 fn main() {
     let input = include_str!("../input");
     let split: Vec<_> = input
-        .split("-")
+        .split('-')
         .map(|s| s.trim().parse::<usize>().unwrap())
         .collect();
     let (low, high) = (split[0], split[1]);
