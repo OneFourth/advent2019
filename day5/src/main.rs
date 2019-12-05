@@ -41,6 +41,34 @@ fn run_program(program: &[Cell<i32>], input: i32) {
                 );
                 pointer += 2;
             }
+            '5' => {
+                if get_parm(1, &digits, pointer, program) != 0 {
+                    pointer = get_parm(2, &digits, pointer, program) as usize;
+                } else {
+                    pointer += 3;
+                }
+            }
+            '6' => {
+                if get_parm(1, &digits, pointer, program) == 0 {
+                    pointer = get_parm(2, &digits, pointer, program) as usize;
+                } else {
+                    pointer += 3;
+                }
+            }
+            '7' => {
+                program[program[pointer + 3].get() as usize].set(
+                    (get_parm(1, &digits, pointer, program)
+                        < get_parm(2, &digits, pointer, program)) as i32,
+                );
+                pointer += 4;
+            }
+            '8' => {
+                program[program[pointer + 3].get() as usize].set(
+                    (get_parm(1, &digits, pointer, program)
+                        == get_parm(2, &digits, pointer, program)) as i32,
+                );
+                pointer += 4;
+            }
             '9' => break,
             _ => panic!("help"),
         };
@@ -56,5 +84,11 @@ fn main() {
         .map(|s| Cell::new(s.parse::<i32>().unwrap()))
         .collect();
 
-    run_program(&base, 1);
+    let part1 = base.clone();
+    println!("Part 1");
+    run_program(&part1, 1);
+
+    println!("Part 2");
+    let part2 = base.clone();
+    run_program(&part2, 5);
 }
