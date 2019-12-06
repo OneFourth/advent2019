@@ -14,8 +14,7 @@ fn counter(mapping: &HashMap<String, String>, k: &str, target: &str) -> (usize, 
             Some(v) => {
                 count += 1;
                 route.insert(v.to_string());
-                if *v == target
-                {
+                if *v == target {
                     break;
                 }
                 search = &v;
@@ -34,12 +33,21 @@ fn main() {
         .map(|s| (s[4..7].to_string(), s[0..3].to_string()))
         .collect::<HashMap<_, _>>();
 
-    let routes: HashMap<_, _> = mapping.keys().map(|k| (k, counter(&mapping, &k, "COM"))).collect();
-    println!("Part 1: {}", routes.iter().map(|t| (t.1).0 ).sum::<usize>());
+    let routes: HashMap<_, _> = mapping
+        .keys()
+        .map(|k| (k, counter(&mapping, &k, "COM")))
+        .collect();
+    println!("Part 1: {}", routes.iter().map(|t| (t.1).0).sum::<usize>());
 
     let you = &routes[&mapping["YOU"]].1;
     let san = &routes[&mapping["SAN"]].1;
 
-    let min: usize = you.intersection(&san).map(|s| counter(&mapping, &mapping["YOU"], &s).0 + counter(&mapping, &mapping["SAN"], &s).0).min().unwrap();
+    let min: usize = you
+        .intersection(&san)
+        .map(|s| {
+            counter(&mapping, &mapping["YOU"], &s).0 + counter(&mapping, &mapping["SAN"], &s).0
+        })
+        .min()
+        .unwrap();
     println!("Part 2: {}", min);
 }
