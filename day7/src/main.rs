@@ -1,9 +1,8 @@
-use std::cell::Cell;
 use permutohedron::Heap;
+use std::cell::Cell;
 
 #[derive(Debug)]
-struct Thruster
-{
+struct Thruster {
     pointer: usize,
     done: bool,
     input: Vec<i32>,
@@ -71,40 +70,40 @@ impl Thruster {
     }
 }
 
-fn thrusters_run(base: &Vec<Cell<i32>>, phase: Vec<i32>, loop_once: bool) -> i32 {
-    let mut thrusters: Vec<_> = phase.iter().map(
-        |&v| Thruster {
+fn thrusters_run(base: &[Cell<i32>], phase: Vec<i32>, loop_once: bool) -> i32 {
+    let mut thrusters: Vec<_> = phase
+        .iter()
+        .map(|&v| Thruster {
             pointer: 0,
             done: false,
             input: vec![v],
-            program: base.clone(),
-        }).collect();
+            program: base.to_vec(),
+        })
+        .collect();
 
     let mut feedback = 0;
     while !&thrusters[4].done {
         for t in &mut thrusters {
             t.input.insert(0, feedback);
-            match t.run_program()
-            {
-                Some(output) => feedback = output,
-                None => (),
+            if let Some(output) = t.run_program() {
+                feedback = output
             }
         }
-        if loop_once
-        {
-            break
+        if loop_once {
+            break;
         }
     }
 
     feedback
 }
 
-fn find_max_signal(base: &Vec<Cell<i32>>, phase: [i32; 5], loop_once: bool) -> i32
-{
+fn find_max_signal(base: &[Cell<i32>], phase: [i32; 5], loop_once: bool) -> i32 {
     let mut values = phase.to_vec();
     let heap = Heap::new(&mut values);
 
-    heap.map(|v| thrusters_run(&base, v, loop_once)).max().unwrap()
+    heap.map(|v| thrusters_run(&base, v, loop_once))
+        .max()
+        .unwrap()
 }
 
 fn main() {
