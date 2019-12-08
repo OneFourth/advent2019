@@ -1,8 +1,7 @@
 use std::ops;
 
 #[derive(Debug, Clone)]
-struct Layer
-{
+struct Layer {
     pixels: Vec<u32>,
 }
 
@@ -11,12 +10,15 @@ impl ops::Add<Layer> for Layer {
 
     fn add(self, _rhs: Layer) -> Layer {
         Layer {
-            pixels: self.pixels.iter().zip(_rhs.pixels.iter()).map(|(a, b)| {
-                match (a, b) {
+            pixels: self
+                .pixels
+                .iter()
+                .zip(_rhs.pixels.iter())
+                .map(|(a, b)| match (a, b) {
                     (2, _) => *b,
                     (_, _) => *a,
-                }
-            }).collect(),
+                })
+                .collect(),
         }
     }
 }
@@ -27,34 +29,50 @@ fn main() {
 
     let width = 25;
     let height = 6;
-    let layers: Vec<_> = chars.chunks(width*height).into_iter().map(|c| Layer{
-        pixels: c.iter().map(|x| x.to_digit(10).unwrap()).collect(),
-    }).collect();
+    let layers: Vec<_> = chars
+        .chunks(width * height)
+        .map(|c| Layer {
+            pixels: c.iter().map(|x| x.to_digit(10).unwrap()).collect(),
+        })
+        .collect();
 
     {
         let mut part1 = layers.clone();
 
-        part1.sort_by(|a, b| a.pixels.iter().filter(|&&p| p == 0).count().partial_cmp(&b.pixels.iter().filter(|&&p| p == 0).count()).unwrap());
+        part1.sort_by(|a, b| {
+            a.pixels
+                .iter()
+                .filter(|&&p| p == 0)
+                .count()
+                .partial_cmp(&b.pixels.iter().filter(|&&p| p == 0).count())
+                .unwrap()
+        });
 
-        println!("Part 1: {:?}", part1[0].pixels.iter().filter(|&&p| p == 1).count() * part1[0].pixels.iter().filter(|&&p| p == 2).count());
+        println!(
+            "Part 1: {:?}",
+            part1[0].pixels.iter().filter(|&&p| p == 1).count()
+                * part1[0].pixels.iter().filter(|&&p| p == 2).count()
+        );
     }
 
     {
         let part2 = layers.clone();
 
         let mut layer = part2.first().unwrap().clone();
-        for n in 1..part2.len() {
-            layer = layer + part2[n].clone();
+        for item in part2.iter().skip(1) {
+            layer = layer + item.clone();
         }
 
         println!("Part 2:");
-        for c in layer.pixels.chunks(25)
-        {
-            for p in c
-            {
-                print!("{}", p);
+        for c in layer.pixels.chunks(25) {
+            for p in c {
+                if *p == 1 {
+                    print!("#");
+                } else {
+                    print!(" ");
+                }
             }
-            print!("\n");
+            println!();
         }
     }
 }
