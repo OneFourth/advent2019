@@ -106,20 +106,12 @@ impl Thruster {
     }
 }
 
-fn main() {
-    let input = include_str!("../input");
-
-    let base: Vec<_> = input
-        .trim()
-        .split(',')
-        .map(|s| Cell::new(s.parse::<i64>().unwrap()))
-        .collect();
-
+fn run(base: &Vec<Cell<i64>>, input: Vec<i64>) {
     let mut t = Thruster {
         pointer: 0,
         done: false,
         relative: 0,
-        input: vec![1],
+        input: input,
         program: base.clone(),
     };
 
@@ -130,4 +122,17 @@ fn main() {
             None => println!("Done!"),
         }
     }
+}
+
+fn main() {
+    let input = include_str!("../input");
+
+    let base: Vec<_> = input
+        .trim()
+        .split(',')
+        .map(|s| Cell::new(s.parse::<i64>().unwrap()))
+        .collect();
+
+    run(&base, vec![1]);
+    run(&base, vec![2]);
 }
