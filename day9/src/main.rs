@@ -22,15 +22,16 @@ impl Thruster {
         &self.access_program(address)
     }
 
-    fn get_parm(&mut self, pos: usize, digits: &Vec<char>) -> &Cell<i64> {
+    fn get_parm(&mut self, pos: usize, digits: &[char]) -> &Cell<i64> {
         if digits.len() > pos + 1 {
             match digits[pos + 1] {
                 '0' => self.get_cell(pos),
                 '1' => self.access_program(self.pointer + pos), // value
                 '2' => {
-                    let address = (self.relative + self.access_program(self.pointer + pos).get()) as usize;
+                    let address =
+                        (self.relative + self.access_program(self.pointer + pos).get()) as usize;
                     self.access_program(address)
-                }, // relative
+                } // relative
                 _ => panic!("help get_parm"),
             }
         } else {
@@ -41,7 +42,8 @@ impl Thruster {
     fn run_program(&mut self) -> Option<i64> {
         let mut result = None;
         while !(self.done || result != None) {
-            let mut digits = self.access_program(self.pointer)
+            let mut digits = self
+                .access_program(self.pointer)
                 .get()
                 .to_string()
                 .chars()
@@ -57,7 +59,7 @@ impl Thruster {
                     let parm1 = self.get_parm(1, &digits).get();
                     let parm2 = self.get_parm(2, &digits).get();
                     self.get_parm(3, &digits).set(parm1 + parm2);
-                },
+                }
                 ('0', '2') => {
                     let parm1 = self.get_parm(1, &digits).get();
                     let parm2 = self.get_parm(2, &digits).get();
@@ -106,20 +108,18 @@ impl Thruster {
     }
 }
 
-fn run(base: &Vec<Cell<i64>>, input: Vec<i64>) {
+fn run(base: &[Cell<i64>], input: Vec<i64>, part: usize) {
     let mut t = Thruster {
         pointer: 0,
         done: false,
         relative: 0,
-        input: input,
-        program: base.clone(),
+        input,
+        program: base.to_owned(),
     };
 
     while !t.done {
-        match t.run_program()
-        {
-            Some(a) => println!("Output: {}", a),
-            None => println!("Done!"),
+        if let Some(a) = t.run_program() {
+            println!("Part {}: {}", part, a);
         }
     }
 }
@@ -133,6 +133,6 @@ fn main() {
         .map(|s| Cell::new(s.parse::<i64>().unwrap()))
         .collect();
 
-    run(&base, vec![1]);
-    run(&base, vec![2]);
+    run(&base, vec![1], 1);
+    run(&base, vec![2], 2);
 }
