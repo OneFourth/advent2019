@@ -49,7 +49,7 @@ fn part2(input: &str) -> i32 {
 
     let part1_data = part1(input);
 
-    let mut all = coords
+    let all = coords
         .iter()
         .filter_map(|b| {
             if part1_data.0 == *b {
@@ -62,15 +62,20 @@ fn part2(input: &str) -> i32 {
 
     let unique_angles: HashSet<_> = all.iter().map(|(a, _, _)| a).collect();
 
-    let mut vec_of_vec: Vec<_> = unique_angles.iter().map(|&a| {
-        let mut vals = all.iter().filter(|(ang, _, _)| a == ang).collect::<Vec<_>>();
-        vals.sort_by(|(_, d1, _), (_, d2, _)| d1.partial_cmp(d2).unwrap());
-        (a, vals)
-    }).collect();
+    let mut vec_of_vec: Vec<_> = unique_angles
+        .iter()
+        .map(|&a| {
+            let mut vals = all
+                .iter()
+                .filter(|(ang, _, _)| a == ang)
+                .collect::<Vec<_>>();
+            vals.sort_by(|(_, d1, _), (_, d2, _)| d1.partial_cmp(d2).unwrap());
+            (a, vals)
+        })
+        .collect();
     vec_of_vec.sort_by(|(a1, _), (a2, _)| a1.cmp(a2));
 
-    println!("{:?}", vec_of_vec);
-    let twohdth = (vec_of_vec.iter().nth(199).unwrap().1)[0].2;
+    let twohdth = (vec_of_vec.get(199).unwrap().1)[0].2;
     (twohdth.0 * 100.0 + twohdth.1) as i32
 }
 
