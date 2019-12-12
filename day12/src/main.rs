@@ -1,4 +1,6 @@
+use num::integer::lcm;
 use regex::Regex;
+use std::collections::HashSet;
 
 type Point = [i64; 3];
 
@@ -54,28 +56,62 @@ fn parse(input: &str) -> Vec<Planet> {
         .collect()
 }
 
+fn apply_movements(planets: &mut Vec<Planet>) {
+    for i in 0..planets.len() {
+        let (left, right) = planets.split_at_mut(i + 1);
+        let mut p1 = &mut left[i];
+
+        right
+            .iter_mut()
+            .for_each(|mut p2| apply_grav(&mut p1, &mut p2));
+
+        p1.apply_vel();
+    }
+}
+
 fn part1(input: &str) -> i64 {
     let mut planets = parse(input);
-    let planet_count = planets.len();
 
     for _ in 1..=1000 {
-        for i in 0..planet_count {
-            let (left, right) = planets.split_at_mut(i + 1);
-            let mut p1 = &mut left[i];
-
-            right
-                .iter_mut()
-                .for_each(|mut p2| apply_grav(&mut p1, &mut p2));
-
-            p1.apply_vel();
-        }
+        apply_movements(&mut planets);
     }
 
     planets.iter().map(|p| p.get_total_energy()).sum::<i64>()
+}
+
+fn part2(input: &str) -> i64 {
+    let mut planets = parse(input);
+
+    let mut sets = [HashSet::new(), HashSet::new(), HashSet::new()];
+    let mut found_all = [false, false, false];
+
+    loop {
+        for i in 0..3 {
+            if !sets[i].insert(
+                planets
+                    .iter()
+                    .map(|p| (p.position[i], p.velocity[i]))
+                    .collect::<Vec<_>>(),
+            ) {
+                found_all[i] = true;
+            }
+        }
+        if found_all.iter().all(|b| *b) {
+            break;
+        }
+
+        apply_movements(&mut planets);
+    }
+
+    lcm(
+        sets[2].len() as i64,
+        lcm(sets[0].len() as i64, sets[1].len() as i64),
+    )
 }
 
 fn main() {
     let input = include_str!("../input");
 
     println!("Part 1: {:?}", part1(input));
+    println!("Part 2: {:?}", part2(input));
 }
