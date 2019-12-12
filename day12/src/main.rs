@@ -38,11 +38,10 @@ fn apply_grav(p1: &mut Planet, p2: &mut Planet) {
     }
 }
 
-fn main() {
+fn parse(input: &str) -> Vec<Planet> {
     let xyz_reg = Regex::new(r"<x=([^,]+), y=([^,]+), z=([^,]+)>").unwrap();
-    let input = include_str!("../input");
 
-    let mut planets: Vec<_> = xyz_reg
+    xyz_reg
         .captures_iter(input)
         .map(|cap| Planet {
             position: [
@@ -52,8 +51,11 @@ fn main() {
             ],
             velocity: [0, 0, 0],
         })
-        .collect();
+        .collect()
+}
 
+fn part1(input: &str) -> i64 {
+    let mut planets = parse(input);
     let planet_count = planets.len();
 
     for _ in 1..=1000 {
@@ -69,8 +71,11 @@ fn main() {
         }
     }
 
-    println!(
-        "Part 1: {:?}",
-        planets.iter().map(|p| p.get_total_energy()).sum::<i64>()
-    );
+    planets.iter().map(|p| p.get_total_energy()).sum::<i64>()
+}
+
+fn main() {
+    let input = include_str!("../input");
+
+    println!("Part 1: {:?}", part1(input));
 }
