@@ -1,7 +1,7 @@
+use crossterm::{cursor, terminal, ExecutableCommand};
 use std::cell::Cell;
-use std::io::{Write, stdout};
 use std::convert::TryFrom;
-use crossterm::{ExecutableCommand, cursor, terminal};
+use std::io::stdout;
 
 use std::collections::HashMap;
 use std::{thread, time};
@@ -135,7 +135,7 @@ fn part1(base: &[Cell<i64>]) -> usize {
         }
     }
 
-    map.iter().filter(|(_, v)| **v == 2 ).count()
+    map.iter().filter(|(_, v)| **v == 2).count()
 }
 
 fn part2(base: &[Cell<i64>]) {
@@ -147,8 +147,6 @@ fn part2(base: &[Cell<i64>]) {
         program: base.to_owned(),
     };
 
-    let mut score = 0;
-
     let mut input = 0;
     let mut px = 0;
     let mut bx = 0;
@@ -157,8 +155,8 @@ fn part2(base: &[Cell<i64>]) {
 
     let mut fast_it = 900;
 
-    stdout.execute(cursor::Hide);
-    stdout.execute(terminal::Clear(terminal::ClearType::All));
+    stdout.execute(cursor::Hide).ok();
+    stdout.execute(terminal::Clear(terminal::ClearType::All)).ok();
 
     while !t.done {
         t.input.clear();
@@ -169,44 +167,44 @@ fn part2(base: &[Cell<i64>]) {
 
         if let (Some(x_), Some(y_), Some(id_)) = (x, y, id) {
             if x_ == -1 && y_ == 0 {
-                score = id_;
-                stdout.execute(cursor::MoveTo(90, 30));
-                print!("Score: {}", score);
-            }
-            else {
-                stdout.execute(cursor::MoveTo(u16::try_from(x_).unwrap() * 2, u16::try_from(y_).unwrap() + 10));
+                stdout.execute(cursor::MoveTo(90, 30)).ok();
+                print!("Score: {}", id_);
+            } else {
+                stdout.execute(cursor::MoveTo(
+                    u16::try_from(x_).unwrap() * 2,
+                    u16::try_from(y_).unwrap() + 10,
+                )).ok();
             }
 
             if id_ == 3 {
                 px = x_;
-            }
-            else if id_ == 4 {
+            } else if id_ == 4 {
                 bx = x_;
             }
 
-            print!("{}", match id_ {
-                1 => "||",
-                2 => "##",
-                3 => "==",
-                4 => "()",
-                _ => "  ",
-            });
+            print!(
+                "{}",
+                match id_ {
+                    1 => "||",
+                    2 => "##",
+                    3 => "==",
+                    4 => "()",
+                    _ => "  ",
+                }
+            );
         }
 
         if px > bx {
             input = -1;
-        }
-        else if px < bx {
+        } else if px < bx {
             input = 1;
-        }
-        else {
+        } else {
             input = 0;
         }
 
         if fast_it > 0 {
             fast_it -= 1;
-        }
-        else {
+        } else {
             thread::sleep(time::Duration::from_millis(16));
         }
     }
