@@ -1,6 +1,10 @@
 use std::cell::Cell;
+use std::io::{Write, stdout};
+use std::convert::TryFrom;
+use crossterm::{ExecutableCommand, cursor, terminal};
 
 use std::collections::HashMap;
+use std::{thread, time};
 
 #[derive(Debug)]
 struct Thruster {
@@ -131,9 +135,81 @@ fn part1(base: &[Cell<i64>]) -> usize {
         }
     }
 
-    println!("{:?}", map);
-
     map.iter().filter(|(_, v)| **v == 2 ).count()
+}
+
+fn part2(base: &[Cell<i64>]) {
+    let mut t = Thruster {
+        pointer: 0,
+        done: false,
+        relative: 0,
+        input: vec![],
+        program: base.to_owned(),
+    };
+
+    let mut score = 0;
+
+    let mut input = 0;
+    let mut px = 0;
+    let mut bx = 0;
+
+    let mut stdout = stdout();
+
+    let mut fast_it = 900;
+
+    stdout.execute(cursor::Hide);
+    stdout.execute(terminal::Clear(terminal::ClearType::All));
+
+    while !t.done {
+        t.input.clear();
+        t.input.push(input);
+        let x = t.run_program();
+        let y = t.run_program();
+        let id = t.run_program();
+
+        if let (Some(x_), Some(y_), Some(id_)) = (x, y, id) {
+            if x_ == -1 && y_ == 0 {
+                score = id_;
+                stdout.execute(cursor::MoveTo(90, 30));
+                print!("Score: {}", score);
+            }
+            else {
+                stdout.execute(cursor::MoveTo(u16::try_from(x_).unwrap() * 2, u16::try_from(y_).unwrap() + 10));
+            }
+
+            if id_ == 3 {
+                px = x_;
+            }
+            else if id_ == 4 {
+                bx = x_;
+            }
+
+            print!("{}", match id_ {
+                1 => "||",
+                2 => "##",
+                3 => "==",
+                4 => "()",
+                _ => "  ",
+            });
+        }
+
+        if px > bx {
+            input = -1;
+        }
+        else if px < bx {
+            input = 1;
+        }
+        else {
+            input = 0;
+        }
+
+        if fast_it > 0 {
+            fast_it -= 1;
+        }
+        else {
+            thread::sleep(time::Duration::from_millis(16));
+        }
+    }
 }
 
 fn main() {
@@ -146,4 +222,7 @@ fn main() {
         .collect();
 
     println!("Part 1: {}", part1(&base));
+
+    base[0].set(2);
+    part2(&base);
 }
