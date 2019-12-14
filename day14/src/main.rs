@@ -80,9 +80,29 @@ fn part1(reactions: &HashMap<String, Reaction>) -> usize {
     s.used_ore
 }
 
+fn part2(reactions: &HashMap<String, Reaction>) -> i64 {
+    let mut s = State {
+        available: HashMap::new(),
+        reactions: &reactions,
+        used_ore: 0,
+    };
+
+    while s.used_ore < 1_000_000_000_000 {
+        let a = *s.available.entry("FUEL".to_string()).or_insert(0) + 1;
+        s.try_create("FUEL", a);
+
+        if s.available["FUEL"] % 10_000 == 0 {
+            println!("{}, {}, {}", s.used_ore, s.available["FUEL"], (s.used_ore as f64) / 1_000_000_000_000.0);
+        }
+    }
+
+    s.available["FUEL"] - 1
+}
+
 fn main() {
     let input = include_str!("../input");
     let reactions: HashMap<_, _> = input.trim().lines().map(new_reaction).collect();
 
     println!("Part 1: {}", part1(&reactions));
+    println!("Part 2: {}", part2(&reactions));
 }
