@@ -92,7 +92,12 @@ fn part2(reactions: &HashMap<String, Reaction>) -> i64 {
         s.try_create("FUEL", a);
 
         if s.available["FUEL"] % 10_000 == 0 {
-            println!("{}, {}, {}", s.used_ore, s.available["FUEL"], (s.used_ore as f64) / 1_000_000_000_000.0);
+            println!(
+                "{}, {}, {}",
+                s.used_ore,
+                s.available["FUEL"],
+                (s.used_ore as f64) / 1_000_000_000_000.0
+            );
         }
     }
 
