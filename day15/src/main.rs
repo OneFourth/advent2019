@@ -241,7 +241,7 @@ fn op_dir(dir: i64) -> i64 {
     }
 }
 
-fn part2(base: &[Cell<i64>]) {
+fn part2(base: &[Cell<i64>]) -> usize {
     let mut t = Thruster {
         pointer: 0,
         done: false,
@@ -313,8 +313,8 @@ fn part2(base: &[Cell<i64>]) {
         }
 
         if let Some(bt) = backtrack.pop() {
-            if bt.len() > 15 {
-                println!();
+            if bt.len() > 3000 {
+                break;
             }
             for i in bt {
                 t.input.push(i);
@@ -324,9 +324,36 @@ fn part2(base: &[Cell<i64>]) {
                 backtrack.iter_mut().for_each(|u| u.insert(0, op_dir(i)));
             }
         }
+        else {
+            println!();
+        }
 
         print(&mut map, &pos);
     }
+    print(&mut map, &pos);
+
+    let mut old_map = HashMap::new();
+    let mut count = 0;
+    loop {
+        old_map = map.clone();
+
+        for (k, _) in old_map.iter().filter(|&(_, v)| *v == 2) {
+            for i in 1..=4 {
+                map.entry(add_dir(*k, i)).and_modify(|v| if *v == 1 {
+                    *v = 2
+                });
+            }
+        }
+
+        print(&mut map, &pos);
+
+        if old_map == map {
+            break;
+        }
+        count += 1;
+    }
+
+    count
 }
 
 fn main() {
@@ -339,5 +366,5 @@ fn main() {
         .collect();
 
     //part1(&base);
-    part2(&base);
+    println!("{}", part2(&base));
 }
