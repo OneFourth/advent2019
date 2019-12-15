@@ -1,9 +1,9 @@
+use crossterm::{cursor, terminal, ExecutableCommand};
+use rand::distributions::{Distribution, Uniform};
+use rand::{thread_rng, Rng};
 use std::cell::Cell;
 use std::collections::HashMap;
-use crossterm::{cursor, terminal, ExecutableCommand};
 use std::io::{stdout, Read};
-use rand::{Rng, thread_rng};
-use rand::distributions::{Distribution, Uniform};
 use std::{thread, time};
 
 #[derive(Debug)]
@@ -181,7 +181,7 @@ fn part1(base: &[Cell<i64>]) {
         match t.run_program() {
             Some(0) => {
                 *map.entry(add_dir(pos, actual_input)).or_insert(0) = 0;
-            },
+            }
             Some(1) => {
                 *map.entry(new_pos).or_insert(1) = 1;
                 pos = new_pos;
@@ -196,7 +196,9 @@ fn part1(base: &[Cell<i64>]) {
         }
 
         stdout.execute(cursor::Hide).ok();
-        stdout.execute(terminal::Clear(terminal::ClearType::All)).ok();
+        stdout
+            .execute(terminal::Clear(terminal::ClearType::All))
+            .ok();
 
         let x_min = map.keys().min_by_key(|(x, _)| x).unwrap().0;
         let x_max = map.keys().max_by_key(|(x, _)| x).unwrap().0;
@@ -208,8 +210,7 @@ fn part1(base: &[Cell<i64>]) {
                 let entry = map.entry((x, y)).or_insert(3);
                 if (x, y) == pos {
                     print!("X");
-                }
-                else {
+                } else {
                     print!(
                         "{}",
                         match *entry {
@@ -218,7 +219,7 @@ fn part1(base: &[Cell<i64>]) {
                             2 => "O",
                             _ => " ",
                         }
-                        )
+                    )
                 };
             }
             println!();
@@ -237,7 +238,7 @@ fn op_dir(dir: i64) -> i64 {
         2 => 1,
         3 => 4,
         4 => 3,
-        _ => panic!()
+        _ => panic!(),
     }
 }
 
@@ -261,7 +262,9 @@ fn part2(base: &[Cell<i64>]) -> usize {
     stdout.execute(cursor::Hide).ok();
 
     let mut print = |map: &mut HashMap<(i64, i64), i64>, pos: &(i64, i64)| {
-        stdout.execute(terminal::Clear(terminal::ClearType::All)).ok();
+        stdout
+            .execute(terminal::Clear(terminal::ClearType::All))
+            .ok();
 
         let x_min = map.keys().min_by_key(|(x, _)| x).unwrap().0;
         let x_max = map.keys().max_by_key(|(x, _)| x).unwrap().0;
@@ -273,8 +276,7 @@ fn part2(base: &[Cell<i64>]) -> usize {
                 let entry = map.entry((x, y)).or_insert(3);
                 if (x, y) == *pos {
                     print!("XX");
-                }
-                else {
+                } else {
                     print!(
                         "{}",
                         match *entry {
@@ -283,7 +285,7 @@ fn part2(base: &[Cell<i64>]) -> usize {
                             2 => "()",
                             _ => "  ",
                         }
-                        )
+                    )
                 };
             }
             println!();
@@ -323,8 +325,7 @@ fn part2(base: &[Cell<i64>]) -> usize {
 
                 backtrack.iter_mut().for_each(|u| u.insert(0, op_dir(i)));
             }
-        }
-        else {
+        } else {
             println!();
         }
 
@@ -339,8 +340,10 @@ fn part2(base: &[Cell<i64>]) -> usize {
 
         for (k, _) in old_map.iter().filter(|&(_, v)| *v == 2) {
             for i in 1..=4 {
-                map.entry(add_dir(*k, i)).and_modify(|v| if *v == 1 {
-                    *v = 2
+                map.entry(add_dir(*k, i)).and_modify(|v| {
+                    if *v == 1 {
+                        *v = 2
+                    }
                 });
             }
         }
