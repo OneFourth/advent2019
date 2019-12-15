@@ -162,8 +162,6 @@ fn part1(base: &[Cell<i64>]) {
         };
 
         /*
-        let mut actual_input = 0;
-
         for i in 1..=4 {
             let got = map.get(&add_dir(pos, i));
             if got == None || got == Some(&3) {
@@ -193,7 +191,6 @@ fn part1(base: &[Cell<i64>]) {
                 *map.entry(new_pos).or_insert(2) = 2;
                 found = Some(new_pos);
                 count += 1;
-                break;
             }
             _ => panic!(),
         }
@@ -234,6 +231,104 @@ fn part1(base: &[Cell<i64>]) {
     println!("{:?}", found);
 }
 
+fn op_dir(dir: i64) -> i64 {
+    match dir {
+        1 => 2,
+        2 => 1,
+        3 => 4,
+        4 => 3,
+        _ => panic!()
+    }
+}
+
+fn part2(base: &[Cell<i64>]) {
+    let mut t = Thruster {
+        pointer: 0,
+        done: false,
+        relative: 0,
+        input: vec![],
+        program: base.to_owned(),
+    };
+
+    let mut map = HashMap::new();
+
+    let mut pos = (0, 0);
+    map.insert(pos, 1);
+
+    let mut backtrack: Vec<Vec<i64>> = vec![];
+
+    let mut stdout = stdout();
+    stdout.execute(cursor::Hide).ok();
+
+    let mut print = |map: &mut HashMap<(i64, i64), i64>, pos: &(i64, i64)| {
+        stdout.execute(terminal::Clear(terminal::ClearType::All)).ok();
+
+        let x_min = map.keys().min_by_key(|(x, _)| x).unwrap().0;
+        let x_max = map.keys().max_by_key(|(x, _)| x).unwrap().0;
+        let y_min = map.keys().min_by_key(|(_, y)| y).unwrap().1;
+        let y_max = map.keys().max_by_key(|(_, y)| y).unwrap().1;
+
+        for y in y_min..=y_max {
+            for x in x_min..=x_max {
+                let entry = map.entry((x, y)).or_insert(3);
+                if (x, y) == *pos {
+                    print!("XX");
+                }
+                else {
+                    print!(
+                        "{}",
+                        match *entry {
+                            0 => "##",
+                            1 => "..",
+                            2 => "()",
+                            _ => "  ",
+                        }
+                        )
+                };
+            }
+            println!();
+        }
+
+        thread::sleep(time::Duration::from_millis(10));
+    };
+
+    loop {
+        for i in 1..=4 {
+            let new_pos = add_dir(pos, i);
+            let got = map.get(&new_pos);
+            if got == None || got == Some(&3) {
+                t.input.push(i);
+
+                let output = t.run_program().unwrap();
+                *map.entry(new_pos).or_insert(output) = output;
+
+                if output == 1 || output == 2 {
+                    t.input.push(op_dir(i));
+                    if 0 == t.run_program().unwrap() {
+                        panic!();
+                    };
+                    backtrack.push(vec![i]);
+                }
+            }
+        }
+
+        if let Some(bt) = backtrack.pop() {
+            if bt.len() > 15 {
+                println!();
+            }
+            for i in bt {
+                t.input.push(i);
+                t.run_program();
+                pos = add_dir(pos, i);
+
+                backtrack.iter_mut().for_each(|u| u.insert(0, op_dir(i)));
+            }
+        }
+
+        print(&mut map, &pos);
+    }
+}
+
 fn main() {
     let input = include_str!("../input");
 
@@ -243,5 +338,6 @@ fn main() {
         .map(|s| Cell::new(s.parse::<i64>().unwrap()))
         .collect();
 
-    part1(&base);
+    //part1(&base);
+    part2(&base);
 }
