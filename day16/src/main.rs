@@ -28,17 +28,18 @@ fn phase(numbers: Vec<isize>) -> Vec<isize> {
     vals
 }
 
-fn part1(numbers: &Vec<isize>) -> Vec<isize> {
-    let mut current = numbers.clone();
+fn part1(numbers: &[isize]) -> Vec<isize> {
+    let mut current = numbers.to_owned();
     for _ in 0..100 {
         current = phase(current);
     }
     current.into_iter().take(8).collect::<Vec<_>>()
 }
 
-fn part2(numbers: &Vec<isize>) -> Vec<isize> {
+fn part2(numbers: &[isize]) -> Vec<isize> {
     let offset = numbers[..7].iter().fold(0, |n, &d| 10 * n + d) as usize;
-    let mut actual_input: Vec<_> = numbers.clone()
+    let mut actual_input: Vec<_> = numbers
+        .to_owned()
         .into_iter()
         .cycle()
         .skip(offset % numbers.len())
