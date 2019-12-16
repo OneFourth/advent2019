@@ -3,7 +3,7 @@ use std::cell::Cell;
 use std::collections::{HashMap, VecDeque};
 
 #[derive(Debug, Default)]
-struct Computer {
+pub struct Computer {
     pointer: usize,
     done: bool,
     rel_pointer: i64,
@@ -13,7 +13,7 @@ struct Computer {
 }
 
 impl Computer {
-    fn new(s: &str) -> Self {
+    pub fn new(s: &str) -> Self {
         let data: Vec<_> = s
             .trim()
             .split(',')
@@ -47,10 +47,14 @@ enum OpCode {
 }
 
 impl OpCode {
-    fn new(s: &str) -> Self {
+    fn new(number: i64) -> Self {
         use OpCode::*;
-        let number = s.parse::<u8>()?;
-        let digits = [number % 100, number % 1_000, number % 10_000, number % 100_000];
+        let digits = [
+            number % 100,
+            number % 1_000,
+            number % 10_000,
+            number % 100_000,
+        ];
 
         let mode = |pos| {
             use Mode::*;
@@ -62,7 +66,7 @@ impl OpCode {
             }
         };
 
-        match code {
+        match digits[0] {
             1 => Add(mode(1), mode(2), mode(3)),
             2 => Mul(mode(1), mode(2), mode(3)),
             3 => Inp(mode(1)),
@@ -84,25 +88,45 @@ impl Computer {
     }
 
     pub fn run(&mut self) -> Option<i64> {
-        while !self.done && result == None {
-            match OpCode::new(self.read_current()) {
-                Add(m1, m2, m3) => self.read_mode(m3).set(self.read_mode(m1).get() + self.read_mode(m2).get()),
-                Mul(m1, m2, m3) => self.read_mode(m3).set(self.read_mode(m1).get() * self.read_mode(m2).get()),
-                Inp(m1) => self.read_mode(m1).set(input.pop_front()),
-                Out(m1) => result = self.read_mode(m1).get(),
+        use OpCode::*;
+        while !self.done {
+            match OpCode::new(self.read_current().get()) {
+                Add(m1, m2, m3) => {
+                    let op1 = self.read_mode(m1).get();
+                    let op2 = self.read_mode(m2).get();
+                    self.read_mode(m3).set(op1 + op2);
+                }
+                Mul(m1, m2, m3) => {
+                    let op1 = self.read_mode(m1).get();
+                    let op2 = self.read_mode(m2).get();
+                    self.read_mode(m3).set(op1 * op2);
+                }
+                Inp(m1) => {
+                    let input = self.input.pop_front().unwrap();
+                    self.read_mode(m1).set(input);
+                }
+                Out(m1) => return Some(self.read_mode(m1).get()),
                 Jne(m1, m2) => {
                     if self.read_mode(m1).get() != 0 {
-                        self.pointer = self.read_mode(m2).get();
+                        self.pointer = self.read_mode(m2).get() as usize;
                     }
-                },
+                }
                 Jeq(m1, m2) => {
                     if self.read_mode(m1).get() == 0 {
-                        self.pointer = self.read_mode(m2).get();
+                        self.pointer = self.read_mode(m2).get() as usize;
                     }
-                },
-                Tlt(m1, m2, m3) => self.read_mode(m3).set((self.read_mode(m1) < self.read_mode(m2)) as i64),
-                Teq(m1, m2, m3) => self.read_mode(m3).set((self.read_mode(m1) == self.read_mode(m2)) as i64),
-                Rel(Mode) => ,
+                }
+                Tlt(m1, m2, m3) => {
+                    let op1 = self.read_mode(m1).get();
+                    let op2 = self.read_mode(m2).get();
+                    self.read_mode(m3).set((op1 < op2) as i64)
+                }
+                Teq(m1, m2, m3) => {
+                    let op1 = self.read_mode(m1).get();
+                    let op2 = self.read_mode(m2).get();
+                    self.read_mode(m3).set((op1 == op2) as i64)
+                }
+                Rel(m1) => self.rel_pointer += self.read_mode(m1).get(),
                 End => self.done = true,
             }
         }
@@ -110,29 +134,34 @@ impl Computer {
         None
     }
 
-    fn read_mode(&mut self, mode: Mode) -> i64 {
+    fn read_mode(&mut self, mode: Mode) -> &Cell<i64> {
         use Mode::*;
         let address = self.pointer;
         self.pointer += 1;
 
-        let address_to_read = match mode {
-            Position => checked_read(checked_read(address).get()).get(),
-            Value => checked_read(address).get(),
-            Relative => checked_read(address + self.rel_pointer).get(),
-        };
+        match mode {
+            Position => {
+                let positional_address = self.checked_read(address).get() as usize;
+                self.checked_read(positional_address)
+            }
+            Value => self.checked_read(address),
+            Relative => self.checked_read((address as i64 + self.rel_pointer) as usize),
+        }
     }
 
     fn read_current(&mut self) -> &Cell<i64> {
         let address = self.pointer;
         self.pointer += 1;
-        self.checked_read(address);
+        self.checked_read(address)
     }
 
     fn checked_read(&mut self, address: usize) -> &Cell<i64> {
         if self.data.len() > address {
             &self.data[address]
         } else {
-            self.extra_memory.entry(address).or_insert(Cell::new(0))
+            self.extra_memory
+                .entry(address)
+                .or_insert_with(|| Cell::new(0))
         }
     }
 }
