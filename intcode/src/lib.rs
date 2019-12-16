@@ -1,34 +1,29 @@
 use std::cell::Cell;
 
-use std::num::ParseIntError;
-use std::str::FromStr;
-
 use std::collections::{HashMap, VecDeque};
 
 #[derive(Debug, Default)]
 struct Computer {
     pointer: usize,
     done: bool,
-    relative: i64,
+    rel_pointer: i64,
     input: VecDeque<i64>,
     data: Vec<Cell<i64>>,
     extra_memory: HashMap<usize, Cell<i64>>,
 }
 
-impl FromStr for Computer {
-    type Err = ParseIntError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
-        let base: Vec<_> = s
+impl Computer {
+    fn new(s: &str) -> Self {
+        let data: Vec<_> = s
             .trim()
             .split(',')
             .map(|s| Cell::new(s.parse::<i64>().unwrap()))
             .collect();
 
-        Ok(Computer {
-            data: base,
+        Computer {
+            data,
             ..Default::default()
-        })
+        }
     }
 }
 
@@ -51,40 +46,33 @@ enum OpCode {
     End,
 }
 
-impl FromStr for OpCode {
-    type Err = ParseIntError;
-
-    fn from_str(s: &str) -> Result<Self, Self::Err> {
+impl OpCode {
+    fn new(s: &str) -> Self {
         use OpCode::*;
-        let digits = s.to_string().chars().rev().collect::<Vec<_>>();
-        let code = digits[1..0].into_iter().collect::<String>().parse::<usize>()?;
+        let number = s.parse::<u8>()?;
+        let digits = [number % 100, number % 1_000, number % 10_000, number % 100_000];
 
         let mode = |pos| {
             use Mode::*;
-            if digits.len() > pos {
-                match digits[pos] {
-                    '0' => Position,
-                    '1' => Value,
-                    '2' => Relative,
-                    _ => panic!("invalid mode"),
-                }
-            }
-            else {
-                Position
+            match digits[pos] {
+                0 => Position,
+                1 => Value,
+                2 => Relative,
+                _ => panic!("invalid mode"),
             }
         };
 
         match code {
-            1 => Ok(Add(mode(1), mode(2), mode(3))),
-            2 => Ok(Mul(mode(1), mode(2), mode(3))),
-            3 => Ok(Inp(mode(1))),
-            4 => Ok(Out(mode(1))),
-            5 => Ok(Jne(mode(1), mode(2))),
-            6 => Ok(Jeq(mode(1), mode(2))),
-            7 => Ok(Tlt(mode(1), mode(2), mode(3))),
-            8 => Ok(Teq(mode(1), mode(2), mode(3))),
-            9 => Ok(Rel(mode(1))),
-            99 => Ok(End),
+            1 => Add(mode(1), mode(2), mode(3)),
+            2 => Mul(mode(1), mode(2), mode(3)),
+            3 => Inp(mode(1)),
+            4 => Out(mode(1)),
+            5 => Jne(mode(1), mode(2)),
+            6 => Jeq(mode(1), mode(2)),
+            7 => Tlt(mode(1), mode(2), mode(3)),
+            8 => Teq(mode(1), mode(2), mode(3)),
+            9 => Rel(mode(1)),
+            99 => End,
             _ => panic!("invalid opcode"),
         }
     }
@@ -96,20 +84,51 @@ impl Computer {
     }
 
     pub fn run(&mut self) -> Option<i64> {
-        let mut result = None;
-
         while !self.done && result == None {
-            let opcode = self.read_current();
+            match OpCode::new(self.read_current()) {
+                Add(m1, m2, m3) => self.read_mode(m3).set(self.read_mode(m1).get() + self.read_mode(m2).get()),
+                Mul(m1, m2, m3) => self.read_mode(m3).set(self.read_mode(m1).get() * self.read_mode(m2).get()),
+                Inp(m1) => self.read_mode(m1).set(input.pop_front()),
+                Out(m1) => result = self.read_mode(m1).get(),
+                Jne(m1, m2) => {
+                    if self.read_mode(m1).get() != 0 {
+                        self.pointer = self.read_mode(m2).get();
+                    }
+                },
+                Jeq(m1, m2) => {
+                    if self.read_mode(m1).get() == 0 {
+                        self.pointer = self.read_mode(m2).get();
+                    }
+                },
+                Tlt(m1, m2, m3) => self.read_mode(m3).set((self.read_mode(m1) < self.read_mode(m2)) as i64),
+                Teq(m1, m2, m3) => self.read_mode(m3).set((self.read_mode(m1) == self.read_mode(m2)) as i64),
+                Rel(Mode) => ,
+                End => self.done = true,
+            }
         }
 
-        result
+        None
+    }
+
+    fn read_mode(&mut self, mode: Mode) -> i64 {
+        use Mode::*;
+        let address = self.pointer;
+        self.pointer += 1;
+
+        let address_to_read = match mode {
+            Position => checked_read(checked_read(address).get()).get(),
+            Value => checked_read(address).get(),
+            Relative => checked_read(address + self.rel_pointer).get(),
+        };
     }
 
     fn read_current(&mut self) -> &Cell<i64> {
-        self.read(self.pointer)
+        let address = self.pointer;
+        self.pointer += 1;
+        self.checked_read(address);
     }
 
-    fn read(&mut self, address: usize) -> &Cell<i64> {
+    fn checked_read(&mut self, address: usize) -> &Cell<i64> {
         if self.data.len() > address {
             &self.data[address]
         } else {
