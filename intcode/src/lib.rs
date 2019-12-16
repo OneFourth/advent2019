@@ -2,29 +2,23 @@ use std::cell::Cell;
 
 use std::collections::{HashMap, VecDeque};
 
+pub type Program = Vec<Cell<i64>>;
+
+pub fn parse_program(s: &str) -> Program {
+    s.trim()
+        .split(',')
+        .map(|s| Cell::new(s.parse::<i64>().unwrap()))
+        .collect()
+}
+
 #[derive(Debug, Default)]
 pub struct Computer {
     pointer: usize,
     done: bool,
     rel_pointer: i64,
-    input: VecDeque<i64>,
-    data: Vec<Cell<i64>>,
+    pub input: VecDeque<i64>,
+    pub data: Program,
     extra_memory: HashMap<usize, Cell<i64>>,
-}
-
-impl Computer {
-    pub fn new(s: &str) -> Self {
-        let data: Vec<_> = s
-            .trim()
-            .split(',')
-            .map(|s| Cell::new(s.parse::<i64>().unwrap()))
-            .collect();
-
-        Computer {
-            data,
-            ..Default::default()
-        }
-    }
 }
 
 enum Mode {
@@ -51,9 +45,9 @@ impl OpCode {
         use OpCode::*;
         let digits = [
             number % 100,
-            number % 1_000,
-            number % 10_000,
-            number % 100_000,
+            (number / 1_000) % 10,
+            (number / 10_000) % 10,
+            (number / 100_000) % 10,
         ];
 
         let mode = |pos| {
@@ -83,7 +77,13 @@ impl OpCode {
 }
 
 impl Computer {
-    pub fn push_input(&mut self, input: i64) {
+    pub fn new(data: Program) -> Self {
+        Computer {
+            data,
+            ..Default::default()
+        }
+    }
+    pub fn push(&mut self, input: i64) {
         self.input.push_back(input);
     }
 
