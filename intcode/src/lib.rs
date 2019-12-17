@@ -45,9 +45,9 @@ impl OpCode {
         use OpCode::*;
         let digits = [
             number % 100,
+            (number / 100) % 10,
             (number / 1_000) % 10,
             (number / 10_000) % 10,
-            (number / 100_000) % 10,
         ];
 
         let mode = |pos| {
@@ -107,13 +107,17 @@ impl Computer {
                 }
                 Out(m1) => return Some(self.read_mode(m1).get()),
                 Jne(m1, m2) => {
-                    if self.read_mode(m1).get() != 0 {
-                        self.pointer = self.read_mode(m2).get() as usize;
+                    let op1 = self.read_mode(m1).get();
+                    let op2 = self.read_mode(m2).get();
+                    if op1 != 0 {
+                        self.pointer = op2 as usize;
                     }
                 }
                 Jeq(m1, m2) => {
-                    if self.read_mode(m1).get() == 0 {
-                        self.pointer = self.read_mode(m2).get() as usize;
+                    let op1 = self.read_mode(m1).get();
+                    let op2 = self.read_mode(m2).get();
+                    if op1 == 0 {
+                        self.pointer = op2 as usize;
                     }
                 }
                 Tlt(m1, m2, m3) => {
