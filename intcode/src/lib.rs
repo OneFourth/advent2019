@@ -14,7 +14,7 @@ pub fn parse_program(s: &str) -> Program {
 #[derive(Debug, Default)]
 pub struct Computer {
     pointer: usize,
-    done: bool,
+    pub done: bool,
     rel_pointer: i64,
     pub input: VecDeque<i64>,
     pub data: Program,
