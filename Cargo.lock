@@ -115,6 +115,7 @@ name = "day13"
 version = "0.1.0"
 dependencies = [
  "crossterm 0.13.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "intcode 0.1.0",
 ]
 
 [[package]]

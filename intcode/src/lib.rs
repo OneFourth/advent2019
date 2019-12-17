@@ -16,7 +16,7 @@ pub struct Computer {
     pointer: usize,
     pub done: bool,
     rel_pointer: i64,
-    pub input: VecDeque<i64>,
+    input: VecDeque<i64>,
     pub data: Program,
     extra_memory: HashMap<usize, Cell<i64>>,
 }
@@ -83,8 +83,13 @@ impl Computer {
             ..Default::default()
         }
     }
+
     pub fn push(&mut self, input: i64) {
         self.input.push_back(input);
+    }
+
+    pub fn clear_input(&mut self) {
+        self.input.clear();
     }
 
     pub fn run(&mut self) -> Option<i64> {
