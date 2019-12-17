@@ -149,7 +149,10 @@ impl Computer {
                 self.checked_read(positional_address)
             }
             Value => self.checked_read(address),
-            Relative => self.checked_read((address as i64 + self.rel_pointer) as usize),
+            Relative => {
+                let relative_address = (self.checked_read(address).get() + self.rel_pointer) as usize;
+                self.checked_read(relative_address)
+            }
         }
     }
 
