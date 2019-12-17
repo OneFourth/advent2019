@@ -88,8 +88,53 @@ dependencies = [
 ]
 
 [[package]]
-name = "day1"
+name = "day01"
 version = "0.1.0"
+
+[[package]]
+name = "day02"
+version = "0.1.0"
+dependencies = [
+ "intcode 0.1.0",
+]
+
+[[package]]
+name = "day03"
+version = "0.1.0"
+
+[[package]]
+name = "day04"
+version = "0.1.0"
+
+[[package]]
+name = "day05"
+version = "0.1.0"
+dependencies = [
+ "intcode 0.1.0",
+]
+
+[[package]]
+name = "day06"
+version = "0.1.0"
+
+[[package]]
+name = "day07"
+version = "0.1.0"
+dependencies = [
+ "intcode 0.1.0",
+ "permutohedron 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
+]
+
+[[package]]
+name = "day08"
+version = "0.1.0"
+
+[[package]]
+name = "day09"
+version = "0.1.0"
+dependencies = [
+ "intcode 0.1.0",
+]
 
 [[package]]
 name = "day10"
@@ -139,51 +184,6 @@ name = "day17"
 version = "0.1.0"
 dependencies = [
  "crossterm 0.14.0 (registry+https://github.com/rust-lang/crates.io-index)",
- "intcode 0.1.0",
-]
-
-[[package]]
-name = "day2"
-version = "0.1.0"
-dependencies = [
- "intcode 0.1.0",
-]
-
-[[package]]
-name = "day3"
-version = "0.1.0"
-
-[[package]]
-name = "day4"
-version = "0.1.0"
-
-[[package]]
-name = "day5"
-version = "0.1.0"
-dependencies = [
- "intcode 0.1.0",
-]
-
-[[package]]
-name = "day6"
-version = "0.1.0"
-
-[[package]]
-name = "day7"
-version = "0.1.0"
-dependencies = [
- "intcode 0.1.0",
- "permutohedron 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
-]
-
-[[package]]
-name = "day8"
-version = "0.1.0"
-
-[[package]]
-name = "day9"
-version = "0.1.0"
-dependencies = [
  "intcode 0.1.0",
 ]
 
