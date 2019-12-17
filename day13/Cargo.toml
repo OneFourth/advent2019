@@ -8,3 +8,4 @@ edition = "2018"
 
 [dependencies]
 crossterm = "0.13.3"
+intcode = { path = "../intcode" }

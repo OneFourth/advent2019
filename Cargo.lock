@@ -98,6 +98,9 @@ version = "0.1.0"
 [[package]]
 name = "day11"
 version = "0.1.0"
+dependencies = [
+ "intcode 0.1.0",
+]
 
 [[package]]
 name = "day12"
@@ -112,6 +115,7 @@ name = "day13"
 version = "0.1.0"
 dependencies = [
  "crossterm 0.13.3 (registry+https://github.com/rust-lang/crates.io-index)",
+ "intcode 0.1.0",
 ]
 
 [[package]]
@@ -140,6 +144,9 @@ dependencies = [
 [[package]]
 name = "day2"
 version = "0.1.0"
+dependencies = [
+ "intcode 0.1.0",
+]
 
 [[package]]
 name = "day3"
@@ -152,6 +159,9 @@ version = "0.1.0"
 [[package]]
 name = "day5"
 version = "0.1.0"
+dependencies = [
+ "intcode 0.1.0",
+]
 
 [[package]]
 name = "day6"
@@ -161,6 +171,7 @@ version = "0.1.0"
 name = "day7"
 version = "0.1.0"
 dependencies = [
+ "intcode 0.1.0",
  "permutohedron 0.2.4 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
@@ -171,6 +182,9 @@ version = "0.1.0"
 [[package]]
 name = "day9"
 version = "0.1.0"
+dependencies = [
+ "intcode 0.1.0",
+]
 
 [[package]]
 name = "fuchsia-zircon"
@@ -195,6 +209,10 @@ dependencies = [
  "libc 0.2.66 (registry+https://github.com/rust-lang/crates.io-index)",
  "wasi 0.7.0 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
+
+[[package]]
+name = "intcode"
+version = "0.1.0"
 
 [[package]]
 name = "iovec"
