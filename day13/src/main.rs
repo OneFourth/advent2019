@@ -2,6 +2,7 @@ use crossterm::{cursor, terminal, ExecutableCommand};
 use std::convert::TryFrom;
 use std::io::stdout;
 
+use std::cmp::Ordering;
 use std::collections::HashMap;
 use std::{thread, time};
 
@@ -37,15 +38,20 @@ fn part2(base: Program, part1_result: usize) {
     let mut fast_it = 900;
 
     stdout.execute(cursor::Hide).ok();
-    stdout.execute(terminal::Clear(terminal::ClearType::All)).ok();
-    print!(r"Part1: {}
+    stdout
+        .execute(terminal::Clear(terminal::ClearType::All))
+        .ok();
+    print!(
+        r"Part1: {}
  _______  _______  ______    _______    _______  ___  
 |       ||   _   ||    _ |  |       |  |       ||   | 
 |    _  ||  |_|  ||   | ||  |_     _|  |____   ||___| 
 |   |_| ||       ||   |_||_   |   |     ____|  | ___  
 |    ___||       ||    __  |  |   |    | ______||   | 
 |   |    |   _   ||   |  | |  |   |    | |_____ |___| 
-|___|    |__| |__||___|  |_|  |___|    |_______|     ", part1_result);
+|___|    |__| |__||___|  |_|  |___|    |_______|     ",
+        part1_result
+    );
 
     while !c.done {
         c.clear_input();
@@ -59,10 +65,12 @@ fn part2(base: Program, part1_result: usize) {
                 stdout.execute(cursor::MoveTo(0, 31)).ok();
                 print!("Score: {}", id_);
             } else {
-                stdout.execute(cursor::MoveTo(
-                    u16::try_from(x_).unwrap() * 2,
-                    u16::try_from(y_).unwrap() + 10,
-                )).ok();
+                stdout
+                    .execute(cursor::MoveTo(
+                        u16::try_from(x_).unwrap() * 2,
+                        u16::try_from(y_).unwrap() + 10,
+                    ))
+                    .ok();
             }
 
             if id_ == 3 {
@@ -83,13 +91,11 @@ fn part2(base: Program, part1_result: usize) {
             );
         }
 
-        if px > bx {
-            input = -1;
-        } else if px < bx {
-            input = 1;
-        } else {
-            input = 0;
-        }
+        input = match px.cmp(&bx) {
+            Ordering::Greater => -1,
+            Ordering::Less => 1,
+            Ordering::Equal => 0,
+        };
 
         if fast_it > 0 {
             fast_it -= 1;
@@ -106,5 +112,5 @@ fn main() {
 
     let part1_result = part1(base.clone());
 
-    part2(base.clone(), part1_result);
+    part2(base, part1_result);
 }

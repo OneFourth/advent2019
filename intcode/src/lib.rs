@@ -155,7 +155,8 @@ impl Computer {
             }
             Value => self.checked_read(address),
             Relative => {
-                let relative_address = (self.checked_read(address).get() + self.rel_pointer) as usize;
+                let relative_address =
+                    (self.checked_read(address).get() + self.rel_pointer) as usize;
                 self.checked_read(relative_address)
             }
         }

@@ -44,8 +44,5 @@ fn main() {
         "Part 1: {}",
         find_max_signal(base.clone(), [0, 1, 2, 3, 4], true)
     );
-    println!(
-        "Part 2: {}",
-        find_max_signal(base.clone(), [5, 6, 7, 8, 9], false)
-    );
+    println!("Part 2: {}", find_max_signal(base, [5, 6, 7, 8, 9], false));
 }

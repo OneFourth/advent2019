@@ -1,5 +1,5 @@
-use std::collections::HashMap;
 use intcode::{parse_program, Computer, Program};
+use std::collections::HashMap;
 
 fn turn_to(dir: i64, turn: i64) -> i64 {
     if turn == 0 {
@@ -86,8 +86,8 @@ fn part2(base: Program) {
 
 fn main() {
     let input = include_str!("../input");
-    let base = parse_program(input); 
+    let base = parse_program(input);
 
     println!("Part 1: {}", part1(base.clone()));
-    part2(base.clone());
+    part2(base);
 }

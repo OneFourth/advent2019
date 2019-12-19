@@ -179,52 +179,45 @@ fn part2() {
         |g| {
             let mut successors = vec![];
             for player in &g.players {
-                successors.extend(
-                    key_doors
-                    .iter()
-                    .filter_map(|(k, v)| {
-                        if !grid_cache.borrow()[&g.grid_key].has_vertex(&v.door) {
-                            let path = astar(
-                                player,
-                                |&p| {
-                                    grid_cache.borrow()[&g.grid_key]
-                                        .neighbours(&p)
-                                        .into_iter()
-                                        .map(|n| (n, 1))
+                successors.extend(key_doors.iter().filter_map(|(k, v)| {
+                    if !grid_cache.borrow()[&g.grid_key].has_vertex(&v.door) {
+                        let path = astar(
+                            player,
+                            |&p| {
+                                grid_cache.borrow()[&g.grid_key]
+                                    .neighbours(&p)
+                                    .into_iter()
+                                    .map(|n| (n, 1))
+                            },
+                            |&p| grid_cache.borrow()[&g.grid_key].distance(&p, &v.key),
+                            |&p| p == v.key,
+                        );
+                        if let Some((_, cost)) = path {
+                            let mut grid = grid_cache.borrow()[&g.grid_key].clone();
+                            grid.add_vertex(v.door);
+
+                            let mut chars: Vec<_> = g.grid_key.chars().collect();
+                            chars.push(*k);
+                            chars.sort();
+
+                            let grid_key: String = chars.into_iter().collect();
+                            grid_cache.borrow_mut().insert(grid_key.clone(), grid);
+
+                            return Some((
+                                EqGrid2 {
+                                    grid_key,
+                                    players: g
+                                        .players
+                                        .iter()
+                                        .map(|&p| if p == *player { v.key } else { p })
+                                        .collect(),
                                 },
-                                |&p| grid_cache.borrow()[&g.grid_key].distance(&p, &v.key),
-                                |&p| p == v.key,
-                                );
-                            if let Some((_, cost)) = path {
-                                let mut grid = grid_cache.borrow()[&g.grid_key].clone();
-                                grid.add_vertex(v.door);
-
-                                let mut chars: Vec<_> = g.grid_key.chars().collect();
-                                chars.push(*k);
-                                chars.sort();
-
-                                let grid_key: String = chars.into_iter().collect();
-                                grid_cache.borrow_mut().insert(grid_key.clone(), grid);
-
-                                return Some((
-                                        EqGrid2 {
-                                            grid_key,
-                                            players: g.players.iter().map(|&p| {
-                                                if p == *player {
-                                                    v.key
-                                                }
-                                                else {
-                                                    p
-                                                }
-                                            }).collect(),
-                                        },
-                                        cost,
-                                        ));
-                            }
+                                cost,
+                            ));
                         }
-                        None
-                    })
-                )
+                    }
+                    None
+                }))
             }
 
             successors
@@ -237,19 +230,19 @@ fn part2() {
                     .iter()
                     .filter_map(|(_, v)| {
                         if !g_grid.has_vertex(&v.door) {
-                            let path = astar(player,
-                                             |&p| g_grid
-                                             .neighbours(&p)
-                                             .into_iter()
-                                             .map(|n| (n, 1)),
-                                             |&p| g_grid.distance(&p, &v.key),
-                                             |&p| p == v.key);
+                            let path = astar(
+                                player,
+                                |&p| g_grid.neighbours(&p).into_iter().map(|n| (n, 1)),
+                                |&p| g_grid.distance(&p, &v.key),
+                                |&p| p == v.key,
+                            );
                             if let Some((_, cost)) = path {
                                 return Some(cost);
                             }
                         }
                         None
-                    }).sum::<usize>()
+                    })
+                    .sum::<usize>()
             }
             dist
         },

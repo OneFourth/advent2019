@@ -1,12 +1,11 @@
-use crossterm::{cursor, terminal, ExecutableCommand};
 use std::collections::HashMap;
-use std::io::{stdout, Read};
-use std::{thread, time};
 use std::convert::TryFrom;
 
 use intcode::{parse_program, Computer, Program};
 
-fn get_map(base: Program) -> (Computer, HashMap<(usize, usize), char>, (usize, usize)) {
+type MapData = HashMap<(usize, usize), char>;
+
+fn get_map(base: Program) -> (Computer, MapData, (usize, usize)) {
     let mut c = Computer::new(base);
 
     let mut map = HashMap::new();
@@ -21,9 +20,7 @@ fn get_map(base: Program) -> (Computer, HashMap<(usize, usize), char>, (usize, u
                 robot_pos = pos;
             }
             pos.0 += 1;
-
-        }
-        else {
+        } else {
             pos.1 += 1;
             pos.0 = 0;
         }
@@ -44,8 +41,8 @@ fn part1(base: Program) -> usize {
 
     let mut count = 0;
 
-    for y in y_min+1..y_max {
-        for x in x_min+1..x_max {
+    for y in y_min + 1..y_max {
+        for x in x_min + 1..x_max {
             if map.get(&(x, y)) == Some(&'#') {
                 let adj = [
                     map.get(&(x - 1, y)),
@@ -54,10 +51,9 @@ fn part1(base: Program) -> usize {
                     map.get(&(x, y + 1)),
                 ];
 
-                if adj.into_iter().all(|v| *v == Some(&'#')) {
+                if adj.iter().all(|v| *v == Some(&'#')) {
                     count += x as usize * y as usize;
                 }
-
             }
         }
     }
@@ -65,8 +61,8 @@ fn part1(base: Program) -> usize {
     count
 }
 
-fn turn((x, y): (i32, i32), turnLeft: bool) -> (i32, i32) {
-    if turnLeft {
+fn turn((x, y): (i32, i32), turn_left: bool) -> (i32, i32) {
+    if turn_left {
         match (x, y) {
             (-1, 0) => (0, 1),
             (1, 0) => (0, -1),
@@ -74,8 +70,7 @@ fn turn((x, y): (i32, i32), turnLeft: bool) -> (i32, i32) {
             (0, 1) => (1, 0),
             _ => panic!(),
         }
-    }
-    else {
+    } else {
         match (x, y) {
             (-1, 0) => (0, -1),
             (1, 0) => (0, 1),
@@ -99,34 +94,29 @@ fn part2(base: Program) -> i64 {
     let (_, map, (mut x, mut y)) = get_map(base.clone());
     let mut movements = vec![];
 
-    let mut currDir = (0, -1);
+    let mut curr_dir = (0, -1);
 
-    let add_dir = |(x, y), (dx, dy)| {
-        ((x as i32 + dx) as usize, (y as i32 + dy) as usize)
-    };
+    let add_dir = |(x, y), (dx, dy)| ((x as i32 + dx) as usize, (y as i32 + dy) as usize);
 
     loop {
-        let right = turn(currDir, false);
-        let left = turn(currDir, true);
-        let (new_x, new_y) = add_dir((x, y), currDir);
+        let right = turn(curr_dir, false);
+        let left = turn(curr_dir, true);
+        let (new_x, new_y) = add_dir((x, y), curr_dir);
         if map.get(&(new_x, new_y)) == Some(&'#') {
             x = new_x;
             y = new_y;
-            let mut last = movements.last_mut();
+            let last = movements.last_mut();
             match last {
                 Some(Move(v)) => *v += 1,
                 _ => movements.push(Move(1)),
             }
-        }
-        else if map.get(&add_dir((x, y), right)) == Some(&'#') {
-            currDir = right;
+        } else if map.get(&add_dir((x, y), right)) == Some(&'#') {
+            curr_dir = right;
             movements.push(TurnRight);
-        }
-        else if map.get(&add_dir((x, y), left)) == Some(&'#') {
-            currDir = left;
+        } else if map.get(&add_dir((x, y), left)) == Some(&'#') {
+            curr_dir = left;
             movements.push(TurnLeft);
-        }
-        else {
+        } else {
             break;
         }
     }
@@ -146,8 +136,7 @@ fn part2(base: Program) -> i64 {
     while let Some(v) = c.run() {
         if let Ok(c) = u8::try_from(v) {
             print!("{}", c as char);
-        }
-        else {
+        } else {
             return v;
         }
     }
@@ -158,7 +147,7 @@ fn main() {
     let input = include_str!("../input");
 
     let base = parse_program(input);
-    
+
     println!("Part 1: {}", part1(base.clone()));
-    println!("Part 2: {}", part2(base.clone()));
+    println!("Part 2: {}", part2(base));
 }

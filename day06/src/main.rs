@@ -13,7 +13,7 @@ fn counter(mapping: &HashMap<String, String>, k: &str, target: &str) -> (usize, 
             None => panic!("Shouldn't get here anymore"),
             Some(v) => {
                 count += 1;
-                route.insert(v.to_string());
+                route.insert((*v).to_string());
                 if *v == target {
                     break;
                 }

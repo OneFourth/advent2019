@@ -4,7 +4,7 @@ fn part1(base: Program) -> i64 {
     base[1].set(12);
     base[2].set(2);
 
-    let mut computer = Computer::new(base.clone());
+    let mut computer = Computer::new(base);
     computer.run();
 
     computer.data[0].get()
@@ -35,7 +35,7 @@ fn main() {
     let base = parse_program(input);
 
     println!("Part 1: {}", part1(base.clone()));
-    println!("Part 2: {}", part2(base.clone()).unwrap());
+    println!("Part 2: {}", part2(base).unwrap());
 }
 
 #[cfg(test)]

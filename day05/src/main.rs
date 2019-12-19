@@ -31,5 +31,5 @@ fn main() {
     let base = parse_program(input);
 
     println!("Part 1: {}", part1(base.clone()));
-    println!("Part 2: {}", part2(base.clone()));
+    println!("Part 2: {}", part2(base));
 }

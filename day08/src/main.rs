@@ -56,7 +56,7 @@ fn main() {
     }
 
     {
-        let part2 = layers.clone();
+        let part2 = layers;
 
         let mut layer = part2.first().unwrap().clone();
         for item in part2.iter().skip(1) {

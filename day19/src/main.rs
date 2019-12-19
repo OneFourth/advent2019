@@ -116,6 +116,6 @@ fn main() {
     let program = parse_program(input);
 
     println!("Part 1: {}", part1(program.clone()));
-    println!("Part 2: {}", part2(program.clone()));
+    println!("Part 2: {}", part2(program));
     //debug_printing(program.clone());
 }
