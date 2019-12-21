@@ -34,7 +34,6 @@ fn part2(base: Program) {
     }
 }
 
-
 fn main() {
     let input = include_str!("../input");
     let base = parse_program(input);
