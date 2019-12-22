@@ -32,19 +32,35 @@ enum Shuffle {
     Stack,
 }
 
-fn part1(commands: Vec<Shuffle>) -> usize {
+fn part1(commands: &[Shuffle]) -> usize {
     let mut cards: Vec<_> = (0..10007).collect();
 
     for n in commands {
         use Shuffle::*;
         cards = match n {
-            Cut(c) => cut(&cards, c),
-            Inc(c) => inc(&cards, c),
+            Cut(c) => cut(&cards, *c),
+            Inc(c) => inc(&cards, *c),
             Stack => stack(&cards),
         }
     }
 
     cards.iter().position(|&v| v == 2019).unwrap()
+}
+
+fn part2(commands: &[Shuffle]) -> isize {
+    const LEN: isize = 119315717514047;
+    let mut val = 2020;
+
+    use Shuffle::*;
+    for command in commands.iter().cycle().take(commands.len() * 101741582076661) {
+        val = match command {
+            Cut(n) => (LEN + val - n) % LEN,
+            Inc(n) => (val * *n as isize) % LEN,
+            Stack => LEN - 1 - val,
+        }
+    }
+
+    val
 }
 
 fn main() {
@@ -64,5 +80,6 @@ fn main() {
         }
     }).collect();
 
-    println!("Part 1: {:?}", part1(commands));
+    println!("Part 1: {:?}", part1(&commands));
+    println!("Part 2: {:?}", part2(&commands));
 }
