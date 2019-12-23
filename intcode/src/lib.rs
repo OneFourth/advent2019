@@ -94,7 +94,7 @@ impl Computer {
     }
 
     pub fn empty(&self) -> bool {
-        self.input.len() == 0
+        self.input.is_empty()
     }
 
     pub fn run(&mut self) -> Option<i64> {
