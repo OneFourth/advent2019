@@ -1,30 +1,6 @@
 use std::convert::TryInto;
 use regex::Regex;
 
-fn stack(cards: &[usize]) -> Vec<usize> {
-    cards.iter().copied().rev().collect()
-}
-
-fn cut(cards: &[usize], n: isize) -> Vec<usize> {
-    let m: isize;
-    if n > 0 {
-       m = n;
-     }
-     else {
-        m = cards.len() as isize + n;
-     }
-     let real_n: usize = m.try_into().unwrap();
-     cards[real_n..].iter().copied().chain(cards[..real_n].iter().copied()).collect()
-}
-
-fn inc(cards: &[usize], n: usize) -> Vec<usize> {
-    let mut result = vec![0; cards.len()];
-    for (i, &v) in cards.iter().enumerate() {
-        result[(i * n) % cards.len()] = v;
-    }
-    result
-}
-
 #[derive(Debug)]
 enum Shuffle {
     Cut(isize),
@@ -32,27 +8,28 @@ enum Shuffle {
     Stack,
 }
 
-fn part1(commands: &[Shuffle]) -> usize {
-    let mut cards: Vec<_> = (0..10007).collect();
+fn part1(commands: &[Shuffle]) -> isize {
+    const LEN: isize = 10007;
+    let mut val = 2019;
 
-    for n in commands {
-        use Shuffle::*;
-        cards = match n {
-            Cut(c) => cut(&cards, *c),
-            Inc(c) => inc(&cards, *c),
-            Stack => stack(&cards),
+    use Shuffle::*;
+    for command in commands.iter().cycle().take(commands.len()) {
+        val = match command {
+            Cut(n) => (LEN + val - n) % LEN,
+            Inc(n) => (val * *n as isize) % LEN,
+            Stack => LEN - 1 - val,
         }
     }
 
-    cards.iter().position(|&v| v == 2019).unwrap()
+    val
 }
 
 fn part2(commands: &[Shuffle]) -> isize {
-    const LEN: isize = 119315717514047;
-    let mut val = 2020;
+    const LEN: isize = 10007;
+    let mut val = 2019;
 
     use Shuffle::*;
-    for command in commands.iter().cycle().take(commands.len() * 101741582076661) {
+    for command in commands.iter().cycle().take(commands.len()) {
         val = match command {
             Cut(n) => (LEN + val - n) % LEN,
             Inc(n) => (val * *n as isize) % LEN,
