@@ -17,6 +17,7 @@ pub struct Computer {
     pub done: bool,
     rel_pointer: i64,
     input: VecDeque<i64>,
+    default: Option<i64>,
     pub data: Program,
     extra_memory: HashMap<usize, Cell<i64>>,
 }
@@ -92,6 +93,10 @@ impl Computer {
         self.input.clear();
     }
 
+    pub fn set_default_input(&mut self, default: Option<i64>) {
+        self.default = default;
+    }
+
     pub fn run(&mut self) -> Option<i64> {
         use OpCode::*;
         while !self.done {
@@ -107,7 +112,14 @@ impl Computer {
                     self.read_mode(m3).set(op1 * op2);
                 }
                 Inp(m1) => {
-                    let input = self.input.pop_front().unwrap();
+                    let input = {
+                        if let Some(pop) = self.input.pop_front() {
+                            pop
+                        }
+                        else {
+                            self.default.expect("Default not set, and no input provided!")
+                        }
+                    };
                     self.read_mode(m1).set(input);
                 }
                 Out(m1) => return Some(self.read_mode(m1).get()),
