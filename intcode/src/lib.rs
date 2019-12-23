@@ -93,8 +93,8 @@ impl Computer {
         self.input.clear();
     }
 
-    pub fn set_default_input(&mut self, default: Option<i64>) {
-        self.default = default;
+    pub fn empty(&self) -> bool {
+        self.input.len() == 0
     }
 
     pub fn run(&mut self) -> Option<i64> {
@@ -112,15 +112,13 @@ impl Computer {
                     self.read_mode(m3).set(op1 * op2);
                 }
                 Inp(m1) => {
-                    let input = {
-                        if let Some(pop) = self.input.pop_front() {
-                            pop
-                        }
-                        else {
-                            self.default.expect("Default not set, and no input provided!")
-                        }
-                    };
-                    self.read_mode(m1).set(input);
+                    if let Some(input) = self.input.pop_front() {
+                        self.read_mode(m1).set(input);
+                    }
+                    else {
+                        self.pointer -= 1;
+                        return None;
+                    }
                 }
                 Out(m1) => return Some(self.read_mode(m1).get()),
                 Jne(m1, m2) => {
