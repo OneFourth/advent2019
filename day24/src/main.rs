@@ -36,17 +36,18 @@ fn part1(state: HashMap<(isize, isize), bool>) -> u32 {
         let mut new_state = HashMap::new();
         for y in 0..5 {
             for x in 0..5 {
-                let adj: Vec<_> = [(x-1, y), (x+1, y), (x, y-1), (x, y+1)].into_iter().filter_map(|p| old_state.get(&p)).collect();
+                let adj: Vec<_> = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1)]
+                    .iter()
+                    .filter_map(|p| old_state.get(&p))
+                    .collect();
                 let bugs = adj.iter().filter(|&&a| *a).count();
                 let curr = *old_state.get(&(x, y)).unwrap();
 
                 if bugs != 1 && curr {
                     new_state.insert((x, y), false);
-                }
-                else if (bugs == 1 || bugs == 2) && !curr {
+                } else if (bugs == 1 || bugs == 2) && !curr {
                     new_state.insert((x, y), true);
-                }
-                else {
+                } else {
                     new_state.insert((x, y), curr);
                 }
             }
@@ -61,14 +62,16 @@ fn part1(state: HashMap<(isize, isize), bool>) -> u32 {
 }
 
 fn part2(state: HashMap<(isize, isize), bool>) -> usize {
-    let mut current_state = state.iter().filter_map(|(&(x, y), &b)| {
-        if !(x == 2 && y == 2) && b {
-            Some((x, y, 0))
-        }
-        else {
-            None
-        }
-    }).collect::<HashSet::<_>>();
+    let mut current_state = state
+        .iter()
+        .filter_map(|(&(x, y), &b)| {
+            if !(x == 2 && y == 2) && b {
+                Some((x, y, 0))
+            } else {
+                None
+            }
+        })
+        .collect::<HashSet<_>>();
 
     for _ in 0..200 {
         let mut counts = HashMap::new();
@@ -172,17 +175,19 @@ fn part2(state: HashMap<(isize, isize), bool>) -> usize {
             }
         }
 
-        current_state = counts.iter().filter_map(|(&p, &c)| {
-            if current_state.contains(&p) {
-                if c == 1 {
+        current_state = counts
+            .iter()
+            .filter_map(|(&p, &c)| {
+                if current_state.contains(&p) {
+                    if c == 1 {
+                        return Some(p);
+                    }
+                } else if c == 1 || c == 2 {
                     return Some(p);
                 }
-            }
-            else if c == 1 || c == 2 {
-                return Some(p);
-            }
-            None
-        }).collect();
+                None
+            })
+            .collect();
     }
 
     current_state.len()
@@ -191,11 +196,16 @@ fn part2(state: HashMap<(isize, isize), bool>) -> usize {
 fn main() {
     let input = include_str!("../input");
 
-    let state: HashMap<_, _> = input.lines().enumerate().flat_map(|(y, l)| {
-        l.trim().chars().enumerate().map(move |(x, c)| {
-            ((x as isize, y as isize), c == '#')
+    let state: HashMap<_, _> = input
+        .lines()
+        .enumerate()
+        .flat_map(|(y, l)| {
+            l.trim()
+                .chars()
+                .enumerate()
+                .map(move |(x, c)| ((x as isize, y as isize), c == '#'))
         })
-    }).collect();
+        .collect();
 
     println!("Part 1: {}", part1(state.clone()));
     println!("Part 2: {}", part2(state));
