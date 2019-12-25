@@ -114,8 +114,7 @@ impl Computer {
                 Inp(m1) => {
                     if let Some(input) = self.input.pop_front() {
                         self.read_mode(m1).set(input);
-                    }
-                    else {
+                    } else {
                         self.pointer -= 1;
                         return None;
                     }

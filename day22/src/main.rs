@@ -1,5 +1,5 @@
-use std::convert::TryInto;
 use regex::Regex;
+use std::convert::TryInto;
 
 #[derive(Debug)]
 enum Shuffle {
@@ -42,20 +42,24 @@ fn part2(commands: &[Shuffle]) -> isize {
 
 fn main() {
     let input = include_str!("../input");
-    let reg = Regex::new(r"cut (?P<cut>-?\d+)|deal with increment (?P<inc>\d+)|deal into new stack(?P<stack>)").unwrap();
-    let commands: Vec<_> = input.lines().map(|s| {
-        use Shuffle::*;
-        let caps = reg.captures(s.trim()).unwrap();
-        if let Some(c) = caps.name("cut") {
-            Cut(c.as_str().parse().unwrap())
-        }
-        else if let Some(c) = caps.name("inc") {
-            Inc(c.as_str().parse().unwrap())
-        }
-        else {
-            Stack
-        }
-    }).collect();
+    let reg = Regex::new(
+        r"cut (?P<cut>-?\d+)|deal with increment (?P<inc>\d+)|deal into new stack(?P<stack>)",
+    )
+    .unwrap();
+    let commands: Vec<_> = input
+        .lines()
+        .map(|s| {
+            use Shuffle::*;
+            let caps = reg.captures(s.trim()).unwrap();
+            if let Some(c) = caps.name("cut") {
+                Cut(c.as_str().parse().unwrap())
+            } else if let Some(c) = caps.name("inc") {
+                Inc(c.as_str().parse().unwrap())
+            } else {
+                Stack
+            }
+        })
+        .collect();
 
     println!("Part 1: {:?}", part1(&commands));
     println!("Part 2: {:?}", part2(&commands));

@@ -1,43 +1,47 @@
 use intcode::{parse_program, Computer, Program};
+use itertools::Itertools;
 use std::convert::TryFrom;
 use std::io::{self, BufRead};
-use itertools::Itertools;
 
 fn part1(base: Program) {
-    let mut inputs = vec!["south",
-    "take fixed point",
-    "north",
-    "north",
-    "take spool of cat6",
-    "north",
-    "take monolith",
-    "north",
-    "take hypercube",
-    "south",
-    "west",
-    "take planetoid",
-    "east",
-    "south",
-    "east",
-    "north",
-    "take candy cane",
-    "south",
-    "east",
-    "take easter egg",
-    "east",
-    "south",
-    "take ornament",
-    "west",
-    "south"];
+    let mut inputs = vec![
+        "south",
+        "take fixed point",
+        "north",
+        "north",
+        "take spool of cat6",
+        "north",
+        "take monolith",
+        "north",
+        "take hypercube",
+        "south",
+        "west",
+        "take planetoid",
+        "east",
+        "south",
+        "east",
+        "north",
+        "take candy cane",
+        "south",
+        "east",
+        "take easter egg",
+        "east",
+        "south",
+        "take ornament",
+        "west",
+        "south",
+    ];
 
-    let items = ["planetoid",
+    let items = [
+        "planetoid",
         "candy cane",
         "spool of cat6",
         "ornament",
         "easter egg",
         "fixed point",
         "hypercube",
-        "monolith"];
+        "monolith",
+    ];
     let mut combos = (1..=items.len()).flat_map(|l| items.iter().combinations(l));
 
     let mut c = Computer::new(base.clone());
@@ -72,12 +76,10 @@ fn part1(base: Program) {
                         let line = "inv\nwest";
                         line.bytes().for_each(|b| c.push(b as i64));
                         c.push('\n' as i64);
-                    }
-                    else {
+                    } else {
                         break;
                     }
-                }
-                else {
+                } else {
                     break;
                 }
             }
